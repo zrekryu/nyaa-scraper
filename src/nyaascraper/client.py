@@ -208,7 +208,7 @@ class NyaaClient:
                 profile_url=user_tag["href"],
                 photo_url=comment.find("img", class_="avatar")["src"]
                 )
-            is_uploader = bool("(uploader)" in comment.find("div", class_="col-md-2").text)
+            is_uploader = bool("(uploader)" in comment.select_onw("div.col-md-2 p").text)
             is_banned = bool("BANNED" in user_tag["title"])
             
             comments.append(
