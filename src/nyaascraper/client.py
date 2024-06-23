@@ -160,15 +160,11 @@ class NyaaClient:
     
     async def get_torrent_info(self: "NyaaClient", view_id: int) -> TorrentInfo:
         url = self.base_url + f"/view/{view_id}"
-        """response = await self._client.get(url)
+        response = await self._client.get(url)
         response.raise_for_status()
         
         if response.status_code == 404:
             raise TorrentNotFoundError(f"Torrent '{view_id}' not found")
-        """
-        
-        with open("torrent.html", "r") as f:
-            response = f.read()
         
         soup = BeautifulSoup(response, "html.parser")
         
