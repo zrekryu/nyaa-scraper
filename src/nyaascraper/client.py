@@ -28,10 +28,20 @@ from .models import (
     )
 
 class NyaaClient:
+    """
+    Scraper client.
+    """
     DEFAULT_SITE: str = SITE.FUN
     TIMEOUT: int = 30
     
-    def __init__(self: "NyaaClient", site: str = DEFAULT_SITE, timeout: int = TIMEOUT) -> None:
+    def __init__(self: "NyaaClient", site: SITE = DEFAULT_SITE, timeout: int = TIMEOUT) -> None:
+        """
+        Initialize scraper client.
+        
+        Parameters:
+            - site (SITE, optional): The site to scrap from. Defaults to DEFAULT_SITE.
+            - timeout (int, optional): The timeout for HTTP requests. Defaults to TIMEOUT.
+        """
         self.site = site
         self.base_url = site.value
         self.timeout = timeout
@@ -48,6 +58,24 @@ class NyaaClient:
         sort_order: Optional[str] = None,
         page: int = 1
         ) -> SearchResult:
+        """
+        Search torrents.
+        
+        Parameters:
+            query (str, optional): Search query. If not provide. Defaults to None.
+            username (str, optional): Search torrents of a user. Defaults to None.
+            filters (Filter, optional): Search by filter. Defaults to Filter.NO_FILTER.
+            category (Union[FunCategory, FapCategory], optional): Search by category. Defaults to None. It'll be assigned to (FanCategory/FapCategory).ALL_CATEGORIES depending on site.
+            sort_by (SortBy, optional): Sort results by. Defaults to None.
+            sort_order (SortOrder, optional): Sort order of search. Defaults to None.
+            page (int, optional): Page number of search result. Defaults to 1.
+        
+        Raises:
+            - httpx.HTTPError: If an HTTP-related error occurs during the request.
+        
+        Returns:
+            SearchResult: Result of the search.
+        """
         if category is None:
             category = get_category_by_key(self.site, "0_0")
         
@@ -170,6 +198,19 @@ class NyaaClient:
             )
     
     async def get_torrent_info(self: "NyaaClient", view_id: int) -> TorrentInfo:
+        """
+        Get torrent information.
+        
+        Parameters:
+            - view_id (int): View-ID of the torrent.
+        
+        Raises:
+            - httpx.HTTPError: If an HTTP-related error occurs during the request.
+            - TorrentNotFoundError: If the torrent of view_id not found.
+        
+        Returns:
+            - TorrentInfo: Information of the torrent.
+        """
         url = self.base_url + f"/view/{view_id}"
         response = await self._http_client.get(url)
         response.raise_for_status()
@@ -259,6 +300,15 @@ class NyaaClient:
             )
     
     def __extract_files_and_folders(self: "NyaaClient", tag: bs4.element.Tag) -> List[Union[File, Folder]]:
+        """
+        Extract files and folders from a BeautifulSoup element tag containing <ul> tag.
+        
+        Parameters:
+            - tag (bs4.element.Tag): A BeautifulSoup element tag containing <ul> tag.
+        
+        Returns:
+            - List[Union[File, Folder]]: A list File or Folder objects.
+        """
         files_and_folders = []
         for li in tag.select("ul li"):
             if (folder_tag := li.find("a", class_="folder")):
