@@ -11,10 +11,12 @@ from .exceptions import TorrentNotFoundError
 from .enums import (
     SITE,
     Filter,
-    Category, SubCategory,
+    FunCategory, FapCategory,
     SortBy, SortOrder,
     TorrentType
     )
+
+from .utils.categories import get_category_by_key
 
 from .models import (
     SearchResult,
@@ -26,26 +28,29 @@ from .models import (
     )
 
 class NyaaClient:
-    BASE_URL: str = SITE.FUN
+    DEFAULT_SITE: str = SITE.FUN
     TIMEOUT: int = 30
     
-    def __init__(self: "NyaaClient", base_url: str = BASE_URL, timeout: int = TIMEOUT) -> None:
-        self.base_url = base_url
+    def __init__(self: "NyaaClient", site: str = DEFAULT_SITE, timeout: int = TIMEOUT) -> None:
+        self.site = site
+        self.base_url = site.value
         self.timeout = timeout
         
-        self._client: httpx.AsyncClient = httpx.AsyncClient(timeout=self.timeout)
+        self._http_client: httpx.AsyncClient = httpx.AsyncClient(timeout=self.timeout)
     
     async def search(
         self: "NyaaClient",
         query: str = None,
         username: Optional[str] = None,
         filters: Filter = Filter.NO_FILTER,
-        category: Category = Category.ALL_CATEGORIES,
-        subcategory: Optional[SubCategory] = None,
+        category: Optional[Union[FunCategory, FapCategory]] = None,
         sort_by: Optional[str] = None,
         sort_order: Optional[str] = None,
         page: int = 1
         ) -> SearchResult:
+        if category is None:
+            category = get_category_by_key(self.site, "0_0")
+        
         if username:
             url = f"{self.base_url}/user/{username}"
         else:
@@ -54,12 +59,12 @@ class NyaaClient:
         params = {
             "q": query,
             "f": filters.value,
-            "c": f"{category.value}_{subcategory.value if subcategory else 0}",
+            "c": category.value,
             **({"s": sort_by.value} if sort_by else {}),
             **({"o": sort_order.value} if sort_order else {}),
             "p": page
         }
-        response = await self._client.get(url, params=params)
+        response = await self._http_client.get(url, params=params)
         response.raise_for_status()
         soup = BeautifulSoup(response.content, "html.parser")
         
@@ -67,16 +72,22 @@ class NyaaClient:
         rows = soup.select("table.torrent-list tbody tr")
         for row in rows:
             color = row["class"][0]
-            category, subcategory = None, None
-            comments, view_id, name = 0, None, None
+            
+            category_ = get_category_by_key(
+                site=self.site,
+                key=row.select_one("a[href^='/?c=']")["href"][4:]
+                )
+            category_icon_url = self.base_url + row.find("img", class_="category-icon")["src"]
+            
+            total_comments, view_id, name = 0, None, None
             for tag in row.select("td[colspan='2'] a"):
                 if "comments" in tag.get("class", []):
-                    comments = int(tag.text)
+                    total_comments = int(tag.text)
                 elif tag.get("href", "").startswith("/view/"):
                     view_id = int(tag["href"][6:])
                     name = tag["title"]
             
-            tds = row.find("td", class_="text-center")
+            tds = row.find_all("td", class_="text-center")
             torrent_url = self.base_url + tds[0].select_one("a[href^='/download/']")["href"]
             magnet_link = tds[0].select_one("a[href^='magnet:?xt=']")["href"]
             
@@ -91,8 +102,8 @@ class NyaaClient:
                     torrent_type=TorrentType.from_color(color),
                     view_id=view_id,
                     name=name,
-                    category=category,
-                    subcategory=subcategory,
+                    category=category_,
+                    category_icon_url=category_icon_url,
                     torrent_url=torrent_url,
                     magnet_link=magnet_link,
                     size=size,
@@ -100,7 +111,7 @@ class NyaaClient:
                     seeders=seeders,
                     leechers=leechers,
                     completed=completed,
-                    comments=comments
+                    total_comments=total_comments
                     )
                 )
         
@@ -160,7 +171,7 @@ class NyaaClient:
     
     async def get_torrent_info(self: "NyaaClient", view_id: int) -> TorrentInfo:
         url = self.base_url + f"/view/{view_id}"
-        response = await self._client.get(url)
+        response = await self._http_client.get(url)
         response.raise_for_status()
         
         if response.status_code == 404:
@@ -168,24 +179,29 @@ class NyaaClient:
         
         soup = BeautifulSoup(response, "html.parser")
         
-        name = soup.select_one("div.panel-heading h3.panel-title").text
+        name = soup.select_one("div.panel-heading h3.panel-title").get_text(strip=True)
         
         rows = soup.select("div.panel-body div.row")
-        category, subcategory = None, None
         
+        category = get_category_by_key(
+            site=self.site,
+            key=rows[0].select_one("a[href^='/?c=']")["href"][4:]
+            )
         timestamp = datetime.utcfromtimestamp(int(rows[0].find("div", attrs={"data-timestamp": True})["data-timestamp"]))
+        
         submitter_link = rows[1].select_one("a[href^='/user/']")
         if submitter_link:
             submitter = User(
                 username=submitter_link["href"][6:],
-                profile_url=submitter_link["href"]
+                profile_url=self.base_url + submitter_link["href"]
                 )
         else:
+            # Submitter was an Anonymous.
             submitter = None
         
         seeders = int(rows[1].select_one("span[style='color: green;']").text)
         
-        information = rows[2].select_one("div.col-md-5").text
+        information = rows[2].select_one("div.col-md-5").get_text(strip=True)
         leechers = int(rows[2].select_one("span[style='color: red;']").text)
         
         divs = rows[3].select("div.col-md-5")
@@ -203,12 +219,13 @@ class NyaaClient:
         comments = []
         for comment in soup.select("div#comments div.comment-panel"):
             user_tag = comment.select_one("a[href^='/user/']")
+            image_src = comment.find("img", class_="avatar")["src"]
             user = User(
                 username=user_tag["href"][6:],
-                profile_url=user_tag["href"],
-                photo_url=comment.find("img", class_="avatar")["src"]
+                profile_url=self.base_url + user_tag["href"],
+                photo_url=self.base_url + image_src if image_src.startswith("/") else image_src
                 )
-            is_uploader = bool("(uploader)" in comment.select_onw("div.col-md-2 p").text)
+            is_uploader = bool("(uploader)" in comment.select_one("div.col-md-2 p").text)
             is_banned = bool("BANNED" in user_tag["title"])
             
             comments.append(
@@ -225,7 +242,6 @@ class NyaaClient:
         return TorrentInfo(
             name=name,
             category=category,
-            subcategory=subcategory,
             torrent_url=torrent_url,
             magnet_link=magnet_link,
             size=size,
@@ -242,9 +258,9 @@ class NyaaClient:
             comments=comments
             )
     
-    def __extract_files_and_folders(self: "NyaaClient", file_list: bs4.element.Tag) -> List[Union[File, Folder]]:
+    def __extract_files_and_folders(self: "NyaaClient", tag: bs4.element.Tag) -> List[Union[File, Folder]]:
         files_and_folders = []
-        for li in file_list.select("ul li"):
+        for li in tag.select("ul li"):
             if (folder_tag := li.find("a", class_="folder")):
                 files_and_folders.append(
                     Folder(

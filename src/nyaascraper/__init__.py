@@ -4,7 +4,7 @@ from .client import NyaaClient
 from .enums import (
     SITE,
     Filter,
-    Category, SubCategory,
+    FunCategory, FapCategory,
     SortBy, SortOrder,
     TorrentType
     )

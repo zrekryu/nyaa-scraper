@@ -2,15 +2,15 @@ from typing import List, Optional, Union
 from dataclasses import dataclass, field
 from datetime import datetime
 
-from .enums.categories import Category, SubCategory
+from .enums.categories import FunCategory, FapCategory
 
 @dataclass
 class SearchResultTorrent:
     torrent_type: str
     view_id: int
     name: str
-    category: Category
-    subcategory: SubCategory
+    category: Union[FunCategory, FapCategory]
+    category_icon_url: str
     torrent_url: str
     magnet_link: str
     size: str
@@ -18,7 +18,7 @@ class SearchResultTorrent:
     seeders: int
     leechers: int
     completed: int
-    comments: int
+    total_comments: int
 
 @dataclass
 class SearchResult:
@@ -52,15 +52,14 @@ class Comment:
     id: int
     user: User
     is_uploader: bool
-    is_banned: bool  # For example: https://nyaa.si/user/Oosik
+    is_banned: bool
     timestamp: datetime
     text: str
 
 @dataclass
 class TorrentInfo:
     name: str
-    category: Category
-    subcategory: SubCategory
+    category: Union[FunCategory, FapCategory]
     torrent_url: str
     magnet_link: str
     size: str
