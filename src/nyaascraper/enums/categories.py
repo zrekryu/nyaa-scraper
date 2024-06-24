@@ -1,0 +1,49 @@
+from enum import Enum
+
+class FunCategory(Enum):
+    ALL_CATEGORIES = "0_0"
+    
+    # SITE: FUN
+    ANIME = "1_0"
+    ANIME_AMV = "1_1"  # AMV: ANIME_MUSIC_VIDEO
+    ANIME_ENGLISH_TRANSLATED = "1_2"
+    ANIME_NON_ENGLISH_TRANSLATED = "1_3"
+    ANIME_RAW = "1_4"
+    
+    AUDIO = "2_0"
+    AUDIO_LOSSLESS = "2_1"
+    AUDIO_LOSSY = "2_2"
+    
+    LITERATURE = "3_0"
+    LITERATURE_ENGLISH_TRANSLATED = "3_1"
+    LITERATURE_NON_ENGLISH_TRANSLATED = "3_2"
+    LITERATURE_RAW = "3_3"
+    
+    LIVE_ACTION = "4_0"
+    LIVE_ACTION_ENGLISH_TRANSLATED = "4_1"
+    LIVE_ACTION_IDOL_PROMOTIONAL_VIDEO = "4_2"
+    LIVE_ACTION_NON_ENGLISH_TRANSLATED = "4_3"
+    LIVE_ACTION_RAW = "4_4"
+    
+    PICTURES = "5_0"
+    PICTURES_GRAPHICS = "5_1"
+    PICTURES_PHOTOS = "5_2"
+    
+    SOFTWARE = "6_0"
+    SOFTWARE_APPLICATIONS = "6_1"
+    SOFTWARE_GAMES = "6_2"
+
+class FapCategory(Enum):
+    ALL_CATEGORIES = "0_0"
+    
+    # SITE: FAP
+    ART = "1_0"
+    ART_ANIME = "1_1"
+    ART_DOUJINSHI = "1_2"
+    ART_GAMES = "1_3"
+    ART_MANGA = "1_4"
+    ART_PICTURES = "1_5"
+    
+    REAL_LIFE = "2_0"
+    REAL_LIFE_PHOTOBOOKS_AND_PICTURES = "2_1"
+    REAL_LIFE_VIDEOS = "2_2"
