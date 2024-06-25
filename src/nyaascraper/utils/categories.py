@@ -100,14 +100,41 @@ fap_category_titles: Dict[str, str] = {
 }
 
 def get_category_by_key(site: SITE, key: str) -> Union[FunCategory, FapCategory]:
+    """
+    Get the category enum member corresponding to the site and key.
+
+    Parameters:
+        - site (SITE): The site, which can be either SITE.FUN or SITE.FAP.
+        - key (str): The key associated with the category.
+
+    Raises:
+        - ValueError: If the site is not recognized.
+        - KeyError: If the key is not found in the category.
+
+    Returns:
+        - Union[FunCategory, FapCategory]: The category enum member corresponding to the given site and key.
+    """
     if site == SITE.FUN:
         return fun_category_keys[key]
     elif site == SITE.FAP:
         return fap_category_keys[key]
     else:
         raise ValueError(f"Unknown site: {site}")
-
 def get_category_title_by_key(site: SITE, key: str) -> str:
+    """
+    Get the category title corresponding to the site and key.
+
+    Parameters:
+        - site (SITE): The site, which can be either SITE.FUN or SITE.FAP.
+        - key (str): The key associated with the category title.
+
+    Raises:
+        - ValueError: If the site is not recognized.
+        - KeyError: If the key is not found in the category titles.
+
+    Returns:
+        - str: The category title corresponding to the given site and key.
+    """
     if site == SITE.FUN:
         return fun_category_titles[key]
     elif site == SITE.FAP:
