@@ -1,3 +1,9 @@
+# nyaascraper
+
+A scraper for [nyaa.si](https://nyaa.si) and [sukebei.nyaa.si](https://sukebei.nyaa.si)
+Written in Python using BeautifulSoup4 and httpx.
+The library is asynchronous.
+
 # Usage
 
 ## Initializing client with site
