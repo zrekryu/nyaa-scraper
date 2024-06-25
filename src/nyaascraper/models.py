@@ -1,5 +1,5 @@
 from typing import List, Optional, Union
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from datetime import datetime
 
 from .enums import FunCategory, FapCategory, TorrentType
@@ -14,10 +14,10 @@ class SearchResultTorrent:
         - view_id (int): View-ID of the torrent.
         - category (Union[FunCategory, FapCategory]): The category of the torrent.
         - category_icon_url (str): The URL of the icon of category.
-        - torrent_url (str): The URL of the torrent.
+        - torrent_url (str): The URL of the torrent file.
         - magnet_link (str): The Magnet Link of the torrent.
         - size (str): The size of the torrent.
-        - timestamp (datetime): The datetime object of when the torrent was uploaded.
+        - timestamp (datetime): The timestamp of when the torrent was uploaded.
         - seeders (int): The number of seeders of the torrent.
         - leechers (int): The number of leechers of the torrent.
         - completed (int): The number of times the torrent has been completed.
@@ -121,6 +121,27 @@ class Comment:
 
 @dataclass
 class TorrentInfo:
+    """
+    Torrent information.
+    
+    Attributes:
+        - name (str): The name of the torrent.
+        - category (Union[FunCategory, FapCategory]): The category of the torrent.
+        - torrent_url (str): The URL of the torrent file.
+        - magnet_link (str): The Magnet Link of the torrent.
+        - size (str): The size of the torrent.
+        - timestamp (datetime): The timestamp of when the torrent was uploaded.
+        - seeders (str): The number of seeders of the torrent.
+        - leechers (str): The number of leechers of the torrent.
+        - completed (str): The number of times the torrent has been completed.
+        - info_hash (str): The info hash of the torrent.
+        - submitter (Optional[User]): The user who uploaded this torrent. If anonymous, the value is None.
+        - information (str): The information of the torrent.
+        - description (str): The description of the torrent.
+        - files (List[Union[File, Folder]]): A list of torrent files.
+        - total_comments (int): The number of total comments on the torrent.
+        - comments (List[Comment]): A list of comments on the torrent.
+    """
     name: str
     category: Union[FunCategory, FapCategory]
     torrent_url: str
@@ -131,9 +152,9 @@ class TorrentInfo:
     leechers: int
     completed: int
     info_hash: str
-    submitter: User
+    submitter: Optional[User]
     information: str
     description: str
-    files: List[Union[File, Folder]] = field(default_factory=list)
-    total_comments: int = field(default=0)
-    comments: List[Comment] = field(default_factory=list)
+    files: List[Union[File, Folder]]
+    total_comments: int
+    comments: List[Comment]

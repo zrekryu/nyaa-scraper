@@ -15,7 +15,6 @@ from .enums import (
     SortBy, SortOrder,
     TorrentType
     )
-
 from .utils.categories import get_category_by_key
 
 from .models import (
@@ -52,7 +51,7 @@ class NyaaClient:
         self: "NyaaClient",
         query: str = None,
         username: Optional[str] = None,
-        filters: Filter = Filter.NO_FILTER,
+        filter_: Filter = Filter.NO_FILTER,
         category: Optional[Union[FunCategory, FapCategory]] = None,
         sort_by: Optional[str] = None,
         sort_order: Optional[str] = None,
@@ -65,7 +64,7 @@ class NyaaClient:
             query (str, optional): Search query. If not provide. Defaults to None.
             username (str, optional): Search torrents of a user. Defaults to None.
             filters (Filter, optional): Search by filter. Defaults to Filter.NO_FILTER.
-            category (Union[FunCategory, FapCategory], optional): Search by category. Defaults to None. It'll be assigned to (FanCategory/FapCategory).ALL_CATEGORIES depending on site.
+            category (Union[FunCategory, FapCategory], optional): Search by category. Defaults to None. If None, it'll be assigned to (FanCategory/FapCategory).ALL_CATEGORIES depending on site.
             sort_by (SortBy, optional): Sort results by. Defaults to None.
             sort_order (SortOrder, optional): Sort order of search. Defaults to None.
             page (int, optional): Page number of search result. Defaults to 1.
@@ -86,7 +85,7 @@ class NyaaClient:
         
         params = {
             "q": query,
-            "f": filters.value,
+            "f": filter_.value,
             "c": category.value,
             **({"s": sort_by.value} if sort_by else {}),
             **({"o": sort_order.value} if sort_order else {}),
