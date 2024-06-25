@@ -49,7 +49,7 @@ class NyaaClient:
     
     async def search(
         self: "NyaaClient",
-        query: str = None,
+        query: Optional[str] = None,
         username: Optional[str] = None,
         filter_: Filter = Filter.NO_FILTER,
         category: Optional[Union[FunCategory, FapCategory]] = None,
@@ -61,12 +61,12 @@ class NyaaClient:
         Search torrents.
         
         Parameters:
-            query (str, optional): Search query. If not provide. Defaults to None.
-            username (str, optional): Search torrents of a user. Defaults to None.
+            query (Optional[str], optional): Search query. If not provide. Defaults to None.
+            username (Optional[str], optional): Search torrents of a user. Defaults to None.
             filters (Filter, optional): Search by filter. Defaults to Filter.NO_FILTER.
             category (Union[FunCategory, FapCategory], optional): Search by category. Defaults to None. If None, it'll be assigned to (FanCategory/FapCategory).ALL_CATEGORIES depending on site.
-            sort_by (SortBy, optional): Sort results by. Defaults to None.
-            sort_order (SortOrder, optional): Sort order of search. Defaults to None.
+            sort_by (Optional[SortBy], optional): Sort results by. Defaults to None.
+            sort_order (Optional[SortOrder], optional): Sort order of search. Defaults to None.
             page (int, optional): Page number of search result. Defaults to 1.
         
         Raises:
@@ -236,7 +236,7 @@ class NyaaClient:
                 profile_url=self.base_url + submitter_link["href"]
                 )
         else:
-            # Submitter was an Anonymous.
+            # Submitter was an anonymous.
             submitter = None
         
         seeders = int(rows[1].select_one("span[style='color: green;']").text)
