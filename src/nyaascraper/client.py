@@ -1,4 +1,4 @@
-from typing import Dict, List, Optional, Union
+from typing import List, Optional, Union
 from datetime import datetime
 from urllib.parse import urlparse, parse_qs
 import re
