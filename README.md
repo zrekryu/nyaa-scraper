@@ -1,13 +1,13 @@
-# nyaa-scraper
+# nyaasi-scraper
 
-nyaa-scraper is an asynchronous Python library for scraping [nyaa.si](https://nyaa.si) and [sukebei.nyaa.si](https://sukebei.nyaa.si), utilizing BeautifulSoup4 and httpx.
+nyaasi-scraper is an asynchronous Python library for scraping [nyaa.si](https://nyaa.si) and [sukebei.nyaa.si](https://sukebei.nyaa.si), utilizing BeautifulSoup4 and httpx.
 
 # Installation
 
 Installing through pip.
 
 ```bash
-pip install nyaa-scraper
+pip install nyaasi-scraper
 ```
 
 # Usage

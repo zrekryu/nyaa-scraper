@@ -9,19 +9,19 @@ with open("requirements.txt", "r", encoding="utf-8") as file:
     requirements = [line.strip() for line in file.read()]
 
 setup(
-    name="nyaa-scraper",
+    name="nyaasi-scraper",
     version=__version__,
-    description="nyaa-scraper is an asynchronous Python library for scraping nyaa.si and sukebei.nyaa.si, utilizing BeautifulSoup4 and httpx.",
+    description="nyaasi-scraper is an asynchronous Python library for scraping nyaa.si and sukebei.nyaa.si, utilizing BeautifulSoup4 and httpx.",
     long_description=long_description,
     long_description_content_type="text/markdown",
     author="ZrekryuDev",
     author_email="zrekryudev@gmail.com",
-    url="https://github.com/zrekryu/nyaa-scraper",
+    url="https://github.com/zrekryu/nyaasi-scraper",
     keywords=[
         "nyaa", "sukebei",
         "torrent",
         "asynchronous",
-        "web scraping", "beautifulsoup4"
+        "web scraping"
         ],
     packages=find_packages(),
     install_requires=requirements,
