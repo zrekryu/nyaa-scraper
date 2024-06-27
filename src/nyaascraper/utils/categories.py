@@ -7,48 +7,48 @@ fun_category_keys: Dict[str, FunCategory] = {
     "0_0": FunCategory.ALL_CATEGORIES,
     
     "1_0": FunCategory.ANIME,
-    "1_1": FunCategory.ANIME_AMV,
-    "1_2": FunCategory.ANIME_ENGLISH_TRANSLATED,
-    "1_3": FunCategory.ANIME_NON_ENGLISH_TRANSLATED,
-    "1_4": FunCategory.ANIME_RAW,
+    "1_1": FunCategory.ANIME__AMV,
+    "1_2": FunCategory.ANIME__ENGLISH_TRANSLATED,
+    "1_3": FunCategory.ANIME__NON_ENGLISH_TRANSLATED,
+    "1_4": FunCategory.ANIME__RAW,
     
     "2_0": FunCategory.AUDIO,
-    "2_1": FunCategory.AUDIO_LOSSLESS,
-    "2_3": FunCategory.AUDIO_LOSSY,
+    "2_1": FunCategory.AUDIO__LOSSLESS,
+    "2_2": FunCategory.AUDIO__LOSSY,
     
     "3_0": FunCategory.LITERATURE,
-    "3_1": FunCategory.LITERATURE_ENGLISH_TRANSLATED,
-    "3_2": FunCategory.LITERATURE_NON_ENGLISH_TRANSLATED,
-    "3_3": FunCategory.LITERATURE_RAW,
+    "3_1": FunCategory.LITERATURE__ENGLISH_TRANSLATED,
+    "3_2": FunCategory.LITERATURE__NON_ENGLISH_TRANSLATED,
+    "3_3": FunCategory.LITERATURE__RAW,
     
     "4_0": FunCategory.LIVE_ACTION,
-    "4_1": FunCategory.LIVE_ACTION_ENGLISH_TRANSLATED,
-    "4_2": FunCategory.LIVE_ACTION_IDOL_PROMOTIONAL_VIDEO,
-    "4_3": FunCategory.LIVE_ACTION_NON_ENGLISH_TRANSLATED,
-    "4_4": FunCategory.LIVE_ACTION_RAW,
+    "4_1": FunCategory.LIVE_ACTION__ENGLISH_TRANSLATED,
+    "4_2": FunCategory.LIVE_ACTION__IDOL_PROMOTIONAL_VIDEO,
+    "4_3": FunCategory.LIVE_ACTION__NON_ENGLISH_TRANSLATED,
+    "4_4": FunCategory.LIVE_ACTION__RAW,
     
     "5_0": FunCategory.PICTURES,
-    "5_1": FunCategory.PICTURES_GRAPHICS,
-    "5_2": FunCategory.PICTURES_PHOTOS,
+    "5_1": FunCategory.PICTURES__GRAPHICS,
+    "5_2": FunCategory.PICTURES__PHOTOS,
     
     "6_0": FunCategory.SOFTWARE,
-    "6_1": FunCategory.SOFTWARE_APPLICATIONS,
-    "6_2": FunCategory.SOFTWARE_GAMES
+    "6_1": FunCategory.SOFTWARE__APPLICATIONS,
+    "6_2": FunCategory.SOFTWARE__GAMES
 }
 
 fap_category_keys: Dict[str, FapCategory] = {
     "0_0": FapCategory.ALL_CATEGORIES,
     
     "1_0": FapCategory.ART,
-    "1_1": FapCategory.ART_ANIME,
-    "1_2": FapCategory.ART_DOUJINSHI,
-    "1_3": FapCategory.ART_GAMES,
-    "1_4": FapCategory.ART_MANGA,
-    "1_5": FapCategory.ART_PICTURES,
+    "1_1": FapCategory.ART__ANIME,
+    "1_2": FapCategory.ART__DOUJINSHI,
+    "1_3": FapCategory.ART__GAMES,
+    "1_4": FapCategory.ART__MANGA,
+    "1_5": FapCategory.ART__PICTURES,
     
     "2_0": FapCategory.REAL_LIFE,
-    "2_1": FapCategory.REAL_LIFE_PHOTOBOOKS_AND_PICTURES,
-    "2_2": FapCategory.REAL_LIFE_VIDEOS
+    "2_1": FapCategory.REAL_LIFE__PHOTOBOOKS_AND_PICTURES,
+    "2_2": FapCategory.REAL_LIFE__VIDEOS
 }
 
 fun_category_titles: Dict[str, str] = {
@@ -120,6 +120,7 @@ def get_category_by_key(site: SITE, key: str) -> Union[FunCategory, FapCategory]
         return fap_category_keys[key]
     else:
         raise ValueError(f"Unknown site: {site}")
+
 def get_category_title_by_key(site: SITE, key: str) -> str:
     """
     Get the category title corresponding to the site and key.
