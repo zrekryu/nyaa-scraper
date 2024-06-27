@@ -41,11 +41,32 @@ class NyaaClient:
             - site (SITE, optional): The site to scrap from. Defaults to DEFAULT_SITE.
             - timeout (int, optional): The timeout for HTTP requests. Defaults to TIMEOUT.
         """
-        self.site = site
+        self._site = site
         self.base_url = site.value
         self.timeout = timeout
         
         self._http_client: httpx.AsyncClient = httpx.AsyncClient(timeout=self.timeout)
+    
+    @property
+    def site(self: "NyaaClient") -> SITE:
+        """
+        Getter property for the current site of the client.
+        
+        Returns:
+            - SITE: The current site used by the client.
+        """
+        return self._site
+    
+    @site.setter
+    def site(self: "NyaaClient", new_site: SITE) -> None:
+        """
+        Set the site to scrap from.
+        
+        Parameters:
+            - new_site (SITE): The new site to set.
+        """
+        self._site = new_site
+        self.base_url = new_site.value
     
     async def search(
         self: "NyaaClient",
