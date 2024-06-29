@@ -10,14 +10,14 @@ class SortBy(Enum):
         DATE (str): Sort by date.
         SEEDERS (str): Sort by seeders.
         LEECHERS (str): Sort by leechers.
-        COMPLETED (str): Sort by completed.
+        DOWNLOADS (str): Sort by downloads.
     """
     COMMENTS = "comments"
     SIZE = "size"
     DATE = "id"
     SEEDERS = "seeders"
     LEECHERS = "leechers"
-    COMPLETED = "downloads"
+    DOWNLOADS = "downloads"
 
 class SortOrder(Enum):
     """

@@ -7,11 +7,11 @@ class TorrentType(Enum):
     Members:
         NORMAL (str): Represents a normal torrent.
         TRUSTED (str): Represents a trusted torrent.
-        REMAKES (str): Represents a remakes torrent.
+        REMAKE (str): Represents a remake torrent.
     """
     NORMAL = "normal"
     TRUSTED = "trusted"
-    REMAKES = "remakes"
+    REMAKE = "remake"
     
     @classmethod
     def from_color(cls, color: str) -> "TorrentType":
@@ -32,6 +32,6 @@ class TorrentType(Enum):
         elif color == "success":
             return cls.TRUSTED
         elif color == "danger":
-            return cls.REMAKES
+            return cls.REMAKE
         else:
             raise ValueError(f"Unknown color: {color}")
