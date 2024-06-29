@@ -15,7 +15,7 @@ from .enums import (
     SortBy, SortOrder,
     TorrentType
     )
-from .utils.categories import get_category_by_key
+from .utils.categories import get_category_by_id
 
 from .models import (
     SearchResult,
@@ -30,7 +30,7 @@ class NyaaClient:
     """
     Scraper client.
     """
-    DEFAULT_SITE: str = SITE.FUN
+    DEFAULT_SITE: SITE = SITE.FUN
     TIMEOUT: int = 30
     
     def __init__(self: "NyaaClient", site: SITE = DEFAULT_SITE, timeout: int = TIMEOUT) -> None:
@@ -38,8 +38,8 @@ class NyaaClient:
         Initialize scraper client.
         
         Parameters:
-            - site (SITE, optional): The site to scrap from. Defaults to DEFAULT_SITE.
-            - timeout (int, optional): The timeout for HTTP requests. Defaults to TIMEOUT.
+            site (SITE, optional): The site to scrape from. Defaults to DEFAULT_SITE.
+            timeout (int, optional): The timeout for HTTP requests. Defaults to TIMEOUT.
         """
         self._site = site
         self.base_url = site.value
@@ -53,17 +53,17 @@ class NyaaClient:
         Getter property for the current site of the client.
         
         Returns:
-            - SITE: The current site used by the client.
+            SITE: The current site used by the client.
         """
         return self._site
     
     @site.setter
     def site(self: "NyaaClient", new_site: SITE) -> None:
         """
-        Set the site to scrap from.
+        Set the site to scrape from.
         
         Parameters:
-            - new_site (SITE): The new site to set.
+            new_site (SITE): The new site to set.
         """
         self._site = new_site
         self.base_url = new_site.value
@@ -82,22 +82,22 @@ class NyaaClient:
         Search torrents.
         
         Parameters:
-            query (Optional[str], optional): Search query. If not provide. Defaults to None.
+            query (Optional[str], optional): Search query. Defaults to None.
             username (Optional[str], optional): Search torrents of a user. Defaults to None.
-            filters (Filter, optional): Search by filter. Defaults to Filter.NO_FILTER.
+            filter_ (Filter, optional): Search by filter. Defaults to Filter.NO_FILTER.
             category (Union[FunCategory, FapCategory], optional): Search by category. Defaults to None. If None, it'll be assigned to (FanCategory/FapCategory).ALL_CATEGORIES depending on site.
             sort_by (Optional[SortBy], optional): Sort results by. Defaults to None.
             sort_order (Optional[SortOrder], optional): Sort order of search. Defaults to None.
             page (int, optional): Page number of search result. Defaults to 1.
         
         Raises:
-            - httpx.HTTPError: If an HTTP-related error occurs during the request.
+            httpx.HTTPError: If an HTTP-related error occurs during the request.
         
         Returns:
             SearchResult: Result of the search.
         """
         if category is None:
-            category = get_category_by_key(self.site, "0_0")
+            category = get_category_by_id(self.site, "0_0")
         
         if username:
             url = f"{self.base_url}/user/{username}"
@@ -112,18 +112,18 @@ class NyaaClient:
             **({"o": sort_order.value} if sort_order else {}),
             "p": page
         }
-        response = await self._http_client.get(url, params=params)
+        response: httpx.Response = await self._http_client.get(url, params=params)
         response.raise_for_status()
         soup = BeautifulSoup(response.content, "html.parser")
         
-        torrents = []
+        torrents: List[SearchResultTorrent] = []
         rows = soup.select("table.torrent-list tbody tr")
         for row in rows:
             color = row["class"][0]
             
-            category_ = get_category_by_key(
+            category_ = get_category_by_id(
                 site=self.site,
-                key=row.select_one("a[href^='/?c=']")["href"][4:]
+                id_=row.select_one("a[href^='/?c=']")["href"][4:]
                 )
             category_icon_url = self.base_url + row.find("img", class_="category-icon")["src"]
             
@@ -222,17 +222,17 @@ class NyaaClient:
         Get torrent information.
         
         Parameters:
-            - view_id (int): View-ID of the torrent.
+            view_id (int): View-ID of the torrent.
         
         Raises:
-            - httpx.HTTPError: If an HTTP-related error occurs during the request.
-            - TorrentNotFoundError: If the torrent of view_id not found.
+            httpx.HTTPError: If an HTTP-related error occurs during the request.
+            TorrentNotFoundError: If the torrent of view_id not found.
         
         Returns:
-            - TorrentInfo: Information of the torrent.
+            TorrentInfo: Information of the torrent.
         """
         url = self.base_url + f"/view/{view_id}"
-        response = await self._http_client.get(url)
+        response: httpx.Response = await self._http_client.get(url)
         response.raise_for_status()
         
         if response.status_code == 404:
@@ -244,9 +244,9 @@ class NyaaClient:
         
         rows = soup.select("div.panel-body div.row")
         
-        category = get_category_by_key(
+        category = get_category_by_id(
             site=self.site,
-            key=rows[0].select_one("a[href^='/?c=']")["href"][4:]
+            id_=rows[0].select_one("a[href^='/?c=']")["href"][4:]
             )
         timestamp = datetime.utcfromtimestamp(int(rows[0].find("div", attrs={"data-timestamp": True})["data-timestamp"]))
         
@@ -277,7 +277,7 @@ class NyaaClient:
         files = self.__extract_files_and_folders(soup.find("div", class_="torrent-file-list"))
         
         total_comments = int(soup.select_one("div#comments div.panel-heading h3.panel-title").text.split("-")[1])
-        comments = []
+        comments: List[Comment] = []
         for comment in soup.select("div#comments div.comment-panel"):
             user_tag = comment.select_one("a[href^='/user/']")
             image_src = comment.find("img", class_="avatar")["src"]
@@ -324,12 +324,12 @@ class NyaaClient:
         Extract files and folders from a BeautifulSoup element tag containing <ul> tag.
         
         Parameters:
-            - tag (bs4.element.Tag): A BeautifulSoup element tag containing <ul> tag.
+            tag (bs4.element.Tag): A BeautifulSoup element tag containing <ul> tag.
         
         Returns:
-            - List[Union[File, Folder]]: A list File or Folder objects.
+            List[Union[File, Folder]]: A list File or Folder objects.
         """
-        files_and_folders = []
+        files_and_folders: List[Union[File, Folder]] = []
         for li in tag.select("ul li"):
             if (folder_tag := li.find("a", class_="folder")):
                 files_and_folders.append(

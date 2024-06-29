@@ -1,6 +1,7 @@
 from typing import List, Optional, Union
 from dataclasses import dataclass
 from datetime import datetime
+import time
 
 from .enums import FunCategory, FapCategory, TorrentType
 
@@ -10,18 +11,18 @@ class SearchResultTorrent:
     Represents a search result torrent.
     
     Attributes:
-        - torrent_type (TorrentType): The type of the torrent.
-        - view_id (int): View-ID of the torrent.
-        - category (Union[FunCategory, FapCategory]): The category of the torrent.
-        - category_icon_url (str): The URL of the icon of category.
-        - torrent_url (str): The URL of the torrent file.
-        - magnet_link (str): The Magnet Link of the torrent.
-        - size (str): The size of the torrent.
-        - timestamp (datetime): The timestamp of when the torrent was uploaded.
-        - seeders (int): The number of seeders of the torrent.
-        - leechers (int): The number of leechers of the torrent.
-        - completed (int): The number of times the torrent has been completed.
-        - total_comments (int): The number of total comments.
+        torrent_type (TorrentType): The type of the torrent.
+        view_id (int): The View-ID of the torrent.
+        category (Union[FunCategory, FapCategory]): The category of the torrent.
+        category_icon_url (str): The URL of the icon of category.
+        torrent_url (str): The URL of the torrent file.
+        magnet_link (str): The Magnet Link of the torrent.
+        size (str): The size of the torrent.
+        timestamp (datetime): The timestamp of when the torrent was uploaded.
+        seeders (int): The number of seeders of the torrent.
+        leechers (int): The number of leechers of the torrent.
+        completed (int): The number of times the torrent has been completed.
+        total_comments (int): The number of total comments.
     """
     torrent_type: TorrentType
     view_id: int
@@ -43,14 +44,14 @@ class SearchResult:
     Search result.
     
     Attributes:
-        - torrents (List[SearchResultTorrent]): A list of SearchResultTorrent objects.
-        - displaying_from (int): The number of results displaying from.
-        - displaying_to (int): The number of results displaying to.
-        - total_results (int): The number of total results.
-        - current_page (int): The number of current result page.
-        - previous_page (int, optional): The number of previous result page. Defaults to None.
-        - next_page (int, optional): The number of next result page. Defaults to None.
-        - available_pages (int, optional): The number of currently avaiable result pages. If exceeded, there might be more result pages. Defaults to None.
+        torrents (List[SearchResultTorrent]): A list of SearchResultTorrent objects.
+        displaying_from (int): The number of results displaying from.
+        displaying_to (int): The number of results displaying to.
+        total_results (int): The number of total results.
+        current_page (int): The number of current result page.
+        previous_page (int, optional): The number of previous result page. Defaults to None.
+        next_page (int, optional): The number of next result page. Defaults to None.
+        available_pages (int, optional): The number of currently avaiable result pages. If exceeded, there might be more result pages. Defaults to None.
     """
     torrents: List[SearchResultTorrent]
     displaying_from: int
@@ -67,9 +68,9 @@ class User:
     An User.
     
     Attributes:
-        - username (str): The username of the user.
-        - profile_url (str): The URL of the user.
-        - photo_url (str, optional): The URL of the photo of the user. Defaults to None.
+        username (str): The username of the user.
+        profile_url (str): The URL of the user.
+        photo_url (str, optional): The URL of the photo of the user. Defaults to None.
     """
     username: str
     profile_url: str
@@ -81,8 +82,8 @@ class File:
     A File.
     
     Attributes:
-        - name (str): The name of the file.
-        - size (str): The size of the file.
+        name (str): The name of the file.
+        size (str): The size of the file.
     """
     name: str
     size: str
@@ -93,8 +94,8 @@ class Folder:
     A Folder.
     
     Attributes:
-        - name (str): The name of the folder.
-        - files (List[Union[File, "Folder"]]): A list of File or Folder objects.
+        name (str): The name of the folder.
+        files (List[Union[File, "Folder"]]): A list of File or Folder objects.
     """
     name: str
     files: List[Union[File, "Folder"]]
@@ -105,12 +106,12 @@ class Comment:
     A Comment.
     
     Attributes:
-        - id (int): The ID of the comment.
-        - user (User): The user who commented.
-        - is_uploader (int): Indicates if the user is uploader of the torrent.
-        - is_banned (int): Indicates if the user is banned.
-        - timestamp (int): The timestamp of when the comment was made.
-        - text (str): The text of the comment.
+        id (int): The ID of the comment.
+        user (User): The user who commented.
+        is_uploader (int): Indicates if the user is uploader of the torrent.
+        is_banned (int): Indicates if the user is banned.
+        timestamp (int): The timestamp of when the comment was made.
+        text (str): The text of the comment.
     """
     id: int
     user: User
@@ -125,22 +126,22 @@ class TorrentInfo:
     Torrent information.
     
     Attributes:
-        - name (str): The name of the torrent.
-        - category (Union[FunCategory, FapCategory]): The category of the torrent.
-        - torrent_url (str): The URL of the torrent file.
-        - magnet_link (str): The Magnet Link of the torrent.
-        - size (str): The size of the torrent.
-        - timestamp (datetime): The timestamp of when the torrent was uploaded.
-        - seeders (str): The number of seeders of the torrent.
-        - leechers (str): The number of leechers of the torrent.
-        - completed (str): The number of times the torrent has been completed.
-        - info_hash (str): The info hash of the torrent.
-        - submitter (Optional[User]): The user who uploaded this torrent. If anonymous, the value is None.
-        - information (str): The information of the torrent.
-        - description (str): The description of the torrent.
-        - files (List[Union[File, Folder]]): A list of torrent files.
-        - total_comments (int): The number of total comments on the torrent.
-        - comments (List[Comment]): A list of comments on the torrent.
+        name (str): The name of the torrent.
+        category (Union[FunCategory, FapCategory]): The category of the torrent.
+        torrent_url (str): The URL of the torrent file.
+        magnet_link (str): The Magnet Link of the torrent.
+        size (str): The size of the torrent.
+        timestamp (datetime): The timestamp of when the torrent was uploaded.
+        seeders (str): The number of seeders of the torrent.
+        leechers (str): The number of leechers of the torrent.
+        completed (str): The number of times the torrent has been completed.
+        info_hash (str): The info hash of the torrent.
+        submitter (Optional[User]): The user who uploaded this torrent. If anonymous, the value is None.
+        information (str): The information of the torrent.
+        description (str): The description of the torrent.
+        files (List[Union[File, Folder]]): A list of torrent files.
+        total_comments (int): The number of total comments on the torrent.
+        comments (List[Comment]): A list of comments on the torrent.
     """
     name: str
     category: Union[FunCategory, FapCategory]
@@ -158,3 +159,54 @@ class TorrentInfo:
     files: List[Union[File, Folder]]
     total_comments: int
     comments: List[Comment]
+
+@dataclass
+class NyaaRSSTorrent:
+    """
+    Represents a torrent entry from Nyaa RSS feed.
+    
+    Attributes:
+        torrent_type (TorrentType): The type of the torrent.
+        view_id (int): The View-ID of the torrent.
+        name (str): The name of the torrent.
+        category (Union[FunCategory, FapCategory]): The category of the torrent.
+        size (str): The size of the torrent.
+        published (str): The published date/time string.
+        published_parsed (time.struct_time): The published date/time as a struct_time object.
+        torrent_url (str): The URL of the torrent file.
+        seeders (int): The number of seeders of the torrent.
+        leechers (int): The number of leechers of the torrent.
+        completed (int): The number of times the torrent has been completed.
+        info_hash (str): The info hash of the torrent.
+        description (str): The CDATA of the RSS feed of the torrent.
+        total_comments (int): The number of total comments on the torrent.
+    """
+    
+    torrent_type: TorrentType
+    view_id: int
+    name: str
+    category: Union[FunCategory, FapCategory]
+    size: str
+    published: str
+    published_parsed: time.struct_time
+    torrent_url: str
+    seeders: int
+    leechers: int
+    completed: int
+    info_hash: str
+    description: str
+    total_comments: int
+
+@dataclass
+class NyaaRSSFeed:
+    """
+    Nyaa RSS Feed.
+    
+    Attributes:
+        title (str): The title of the RSS feed.
+        description (str): The description of the RSS feed.
+        torrents (List[NyaaRSSTorrent]): A list of torrents in the RSS feed.
+    """
+    title: str
+    description: str
+    torrents: List[NyaaRSSTorrent]
