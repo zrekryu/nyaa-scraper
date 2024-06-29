@@ -11,7 +11,7 @@ with open("requirements.txt", "r", encoding="utf-8") as file:
 setup(
     name="nyaasi-scraper",
     version=__version__,
-    description="nyaasi-scraper is an asynchronous Python library for scraping nyaa.si and sukebei.nyaa.si, utilizing BeautifulSoup4 and httpx.",
+    description="nyaasi-scraper is an asynchronous Python library for scraping nyaa.si and sukebei.nyaa.si.",
     long_description=long_description,
     long_description_content_type="text/markdown",
     author="ZrekryuDev",

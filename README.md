@@ -1,6 +1,6 @@
 # nyaasi-scraper
 
-nyaasi-scraper is an asynchronous Python library for scraping [nyaa.si](https://nyaa.si) and [sukebei.nyaa.si](https://sukebei.nyaa.si), utilizing BeautifulSoup4 and httpx.
+nyaasi-scraper is an asynchronous Python library for scraping [nyaa.si](https://nyaa.si) and [sukebei.nyaa.si](https://sukebei.nyaa.si).
 
 # Installation
 
@@ -12,7 +12,7 @@ pip install nyaasi-scraper
 
 # Usage
 
-## Initializing client with site
+## Initializing Client with Site
 
 By default, the site is nyaa.si (work-safe site).
 
@@ -121,6 +121,51 @@ view_id: int = result.torrents[0].view_id
 
 torrent_info: TorrentInfo = await client.get_torrent_info(view_id)
 print(torrent_info)
+```
+
+## RSS Feed
+
+### Initializing Client with Site
+
+By default, the site is nyaa.si (work-safe site).
+
+```py
+from nyaascraper import NyaaRSSClient, SITE
+
+# Work-safe site.
+client = NyaaRSSClient(SITE.FUN)
+
+# Non-work-safe site.
+client = NyaaRSSClient(SITE.FAP)
+```
+
+### Changing Site
+
+You can change the site of the client dynamically.
+
+```py
+from nyaascraper import SITE
+
+client.site = SITE.FUN
+```
+
+### Get RSS feed
+
+```py
+from nyaascraper.enums import Filter, FunCategory
+from nyaascraper.models import NyaaRSSFeed, NyaaRSSTorrent
+
+# All parameters passed are optional.
+feed: NyaaRSSFeed = await client.get_feed(
+    query="your query...",
+    username="Erai-raws",
+    filter_=Filter.TRUSTED,
+    category=FunCategory.ANIME__ENGLISH_TRANSLATED
+    )
+print(feed)
+
+for torrent in feed.torrents:
+    print(torrent)
 ```
 
 # License
