@@ -1,4 +1,4 @@
 from ._version import __version__
 
 from .client import NyaaClient
-from .rss import NyaaRRSClient
+from .rss import NyaaRSSClient
