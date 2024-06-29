@@ -54,19 +54,16 @@ for torrent in result.torrents:
 ## Search by Username
 
 ```py
-from nyaascraper.models import SearchResult
-
-result: SearchResult = await client.search(username="Erai-raws")
+result = await client.search(username="Erai-raws")
 print(result)
 ```
 
 ### Search with Filter
 
 ```py
-from nyaascraper.models import SearchResult
 from nyaascraper import Filter
 
-result: SearchResult = await client.search(filter_=Filter.TRUSTED_ONLY)
+result = await client.search(filter_=Filter.TRUSTED_ONLY)
 print(result)
 ```
 
@@ -74,22 +71,21 @@ print(result)
 
 ```py
 from nyaascraper.enums import FunCategory, FapCategory
-from nyaascraper.models import SearchResult
 
 # Work-safe category.
-result: SearchResult = await client.search(category=FunCategory.ANIME)
+result = await client.search(category=FunCategory.ANIME)
 print(result)
 
 # Work-safe subcategory search.
-result: SearchResult = await client.search(category=FunCategory.ANIME__ENGLISH_TRANSLATED)
+result = await client.search(category=FunCategory.ANIME__ENGLISH_TRANSLATED)
 print(result)
 
 # Non-work-safe category.
-result: SearchResult = await client.search(category=FapCategory.ART)
+result = await client.search(category=FapCategory.ART)
 print(result)
 
 # Non-work-safe subcategory search.
-result: SearchResult = await client.search(category=FunCategory.ART__MANGA)
+result = await client.search(category=FunCategory.ART__MANGA)
 print(result)
 ```
 
@@ -97,27 +93,24 @@ print(result)
 
 ```py
 from nyaascraper.enums import SortBy, SortOrder
-from nyaascraper.models import SearchResult
 
-result: SearchResult = await client.search(sort_by=SortBy.DATE, sort_order=SortOrder.DESCENDING)
+result = await client.search(sort_by=SortBy.DATE, sort_order=SortOrder.DESCENDING)
 print(result)
 ```
 
 ### Search by Page
 
 ```py
-from nyaascraper.models import SearchResult
-
-result: SearchResult = await client.search(page=2)
+result = await client.search(page=2)
 print(result)
 ```
 
 ## Getting Torrent Information
 
 ```py
-from nyaascraper.models import SearchResult, TorrentInfo
+from nyaascraper.models import TorrentInfo
 
-result: SearchResult = await client.search()
+result = await client.search()
 
 # Select View-ID of first torrent from the search result.
 view_id: int = result.torrents[0].view_id
