@@ -51,6 +51,15 @@ for torrent in result.torrents:
     print(torrent)
 ```
 
+## Search by Username
+
+```py
+from nyaascraper.models import SearchResult
+
+result: SearchResult = await client.search(username="Erai-raws")
+print(result)
+```
+
 ### Search with Filter
 
 ```py
@@ -60,8 +69,6 @@ from nyaascraper import Filter
 result: SearchResult = await client.search(filter_=Filter.TRUSTED_ONLY)
 print(result)
 ```
-
-Refer to the documentation for Filter for more details.
 
 ### Search with Category
 
@@ -86,8 +93,6 @@ result: SearchResult = await client.search(category=FunCategory.ART__MANGA)
 print(result)
 ```
 
-Explore FunCategory and FapCategory for more options.
-
 ### Search Sorting
 
 ```py
@@ -97,8 +102,6 @@ from nyaascraper.models import SearchResult
 result: SearchResult = await client.search(sort_by=SortBy.DATE, sort_order=SortOrder.DESCENDING)
 print(result)
 ```
-
-Check SortBy and SortOrder for additional sorting methods.
 
 ### Search by Page
 
