@@ -61,7 +61,7 @@ result: SearchResult = await client.search(filter_=Filter.TRUSTED_ONLY)
 print(result)
 ```
 
-See `help(Filter)` for more.
+Refer to the documentation for Filter for more details.
 
 ### Search with Category
 
@@ -86,7 +86,7 @@ result: SearchResult = await client.search(category=FunCategory.ART__MANGA)
 print(result)
 ```
 
-See `help(FunCategory)` and `help(FapCategory)` for more.
+Explore FunCategory and FapCategory for more options.
 
 ### Search Sorting
 
@@ -98,7 +98,7 @@ result: SearchResult = await client.search(sort_by=SortBy.DATE, sort_order=SortO
 print(result)
 ```
 
-See `help(SortBy)` and `help(SortOrder)` for more.
+Check SortBy and SortOrder for additional sorting methods.
 
 ### Search by Page
 
@@ -159,11 +159,14 @@ from nyaascraper.models import NyaaRSSFeed, NyaaRSSTorrent
 feed: NyaaRSSFeed = await client.get_feed(
     query="your query...",
     username="Erai-raws",
-    filter_=Filter.TRUSTED,
+    filter_=Filter.TRUSTED_ONLY,
     category=FunCategory.ANIME__ENGLISH_TRANSLATED
     )
-print(feed)
 
+print("Title:", feed.title)
+print("Description:", feed.description)
+
+# Iterate over torrents.
 for torrent in feed.torrents:
     print(torrent)
 ```
