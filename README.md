@@ -51,7 +51,7 @@ for torrent in result.torrents:
     print(torrent)
 ```
 
-## Search by Username
+### Search by Username
 
 ```py
 result = await client.search(username="Erai-raws")
@@ -63,7 +63,16 @@ print(result)
 ```py
 from nyaascraper import Filter
 
+# No Filter. (Default)
+result = await client.search(filter_=Filter.NO_FILTER)
+print(result)
+
+# Trusted only.
 result = await client.search(filter_=Filter.TRUSTED_ONLY)
+print(result)
+
+# No Remakes.
+result = await client.search(filter_=Filter.NO_REMAKES)
 print(result)
 ```
 
@@ -89,12 +98,41 @@ result = await client.search(category=FunCategory.ART__MANGA)
 print(result)
 ```
 
-### Search Sorting
+### Search with Sorting
 
 ```py
 from nyaascraper.enums import SortBy, SortOrder
 
-result = await client.search(sort_by=SortBy.DATE, sort_order=SortOrder.DESCENDING)
+# Sort by comments.
+result = await client.search(sort_by=SortBy.COMMENTS)
+print(result)
+
+# Sort by size.
+result = await client.search(sort_by=SortBy.SIZE)
+print(result)
+
+# Sort by date.
+result = await client.search(sort_by=SortBy.DATE)
+print(result)
+
+# Sort by seeders.
+result = await client.search(sort_by=SortBy.SEEDERS)
+print(result)
+
+# Sort by leechers.
+result = await client.search(sort_by=SortBy.LEECHERS)
+print(result)
+
+# Sort by downloads.
+result = await client.search(sort_by=SortBy.DOWNLOADS)
+print(result)
+
+# Sort order: Ascending.
+result = await client.search(sort_order=SortOrder.ASCENDING)
+print(result)
+
+# Sort order: Descending.
+result = await client.search(sort_order=SortOrder.DESCENDING)
 print(result)
 ```
 
@@ -149,7 +187,7 @@ client.site = SITE.FUN
 
 ```py
 from nyaascraper.enums import Filter, FunCategory
-from nyaascraper.models import NyaaRSSFeed, NyaaRSSTorrent
+from nyaascraper.models import NyaaRSSFeed
 
 # All parameters passed are optional.
 feed: NyaaRSSFeed = await client.get_feed(
