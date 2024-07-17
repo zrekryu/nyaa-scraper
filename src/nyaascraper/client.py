@@ -1,4 +1,3 @@
-from typing import List, Optional, Union
 from datetime import datetime
 from urllib.parse import urlparse, parse_qs
 import re
@@ -10,10 +9,11 @@ import httpx
 from .exceptions import TorrentNotFoundError
 from .enums import (
     SITE,
-    Filter,
+    QualityFilter,
     FunCategory, FapCategory,
     SortBy, SortOrder,
-    TorrentType
+    TorrentType,
+    UserLevel
     )
 from .utils.categories import get_category_by_id
 
@@ -70,24 +70,24 @@ class NyaaClient:
     
     async def search(
         self: "NyaaClient",
-        query: Optional[str] = None,
-        username: Optional[str] = None,
-        filter_: Filter = Filter.NO_FILTER,
-        category: Optional[Union[FunCategory, FapCategory]] = None,
-        sort_by: Optional[str] = None,
-        sort_order: Optional[str] = None,
+        term: str | None = None,
+        username: str | None = None,
+        quality_filter: QualityFilter = QualityFilter.NO_FILTER,
+        category: FunCategory | FapCategory | None = None,
+        sort_by: str | None = None,
+        sort_order: str | None = None,
         page: int = 1
         ) -> SearchResult:
         """
         Search torrents.
         
         Parameters:
-            query (Optional[str], optional): Search query. Defaults to None.
-            username (Optional[str], optional): Search torrents of a user. Defaults to None.
-            filter_ (Filter, optional): Search by filter. Defaults to Filter.NO_FILTER.
-            category (Union[FunCategory, FapCategory], optional): Search by category. Defaults to None. If None, it'll be assigned to (FanCategory/FapCategory).ALL_CATEGORIES depending on site.
-            sort_by (Optional[SortBy], optional): Sort results by. Defaults to None.
-            sort_order (Optional[SortOrder], optional): Sort order of search. Defaults to None.
+            term (str | None, optional): Search term. Defaults to None.
+            username (str | None, optional): Search torrents of a user. Defaults to None.
+            quality_filter (QualityFilter | None, optional): Filter torrents by quality. If not specified, defaults to QualityFilter.NO_FILTER.
+            category (FunCategory | FapCategory | None, optional): Filter torrents by category. If not specified, a default category is used. Defaults to None.
+            sort_by (SortBy | None, optional): Sort results by. Defaults to None.
+            sort_order (SortOrder | None, optional): Sort order of search. Defaults to None.
             page (int, optional): Page number of search result. Defaults to 1.
         
         Raises:
@@ -105,8 +105,8 @@ class NyaaClient:
             url = self.base_url
         
         params = {
-            "q": query,
-            "f": filter_.value,
+            "q": term,
+            "f": quality_filter.value,
             "c": category.value,
             **({"s": sort_by.value} if sort_by else {}),
             **({"o": sort_order.value} if sort_order else {}),
@@ -116,14 +116,12 @@ class NyaaClient:
         response.raise_for_status()
         soup = BeautifulSoup(response.content, "html.parser")
         
-        torrents: List[SearchResultTorrent] = []
+        torrents: list[SearchResultTorrent] = []
         rows = soup.select("table.torrent-list tbody tr")
         for row in rows:
-            color = row["class"][0]
-            
             category_ = get_category_by_id(
                 site=self.site,
-                id_=row.select_one("a[href^='/?c=']")["href"][4:]
+                category_id=row.select_one("a[href^='/?c=']")["href"][4:]
                 )
             category_icon_url = self.base_url + row.find("img", class_="category-icon")["src"]
             
@@ -147,7 +145,7 @@ class NyaaClient:
             
             torrents.append(
                 SearchResultTorrent(
-                    torrent_type=TorrentType.from_color(color),
+                    torrent_type=TorrentType.from_color(row["class"][0]),
                     view_id=view_id,
                     name=name,
                     category=category_,
@@ -226,7 +224,7 @@ class NyaaClient:
         
         Raises:
             httpx.HTTPError: If an HTTP-related error occurs during the request.
-            TorrentNotFoundError: If the torrent of view_id not found.
+            TorrentNotFoundError: If the torrent of view id not found.
         
         Returns:
             TorrentInfo: Information of the torrent.
@@ -246,7 +244,7 @@ class NyaaClient:
         
         category = get_category_by_id(
             site=self.site,
-            id_=rows[0].select_one("a[href^='/?c=']")["href"][4:]
+            category_id=rows[0].select_one("a[href^='/?c=']")["href"][4:]
             )
         timestamp = datetime.utcfromtimestamp(int(rows[0].find("div", attrs={"data-timestamp": True})["data-timestamp"]))
         
@@ -274,27 +272,26 @@ class NyaaClient:
         magnet_link = soup.select_one("div.panel-footer a[href^='magnet:?xt=']")["href"]
         
         description = soup.find("div", id="torrent-description").text
-        files = self.__extract_files_and_folders(soup.find("div", class_="torrent-file-list"))
+        files: list[File | Folder] = self.__extract_files_and_folders(soup.find("div", class_="torrent-file-list"))
         
         total_comments = int(soup.select_one("div#comments div.panel-heading h3.panel-title").text.split("-")[1])
-        comments: List[Comment] = []
+        comments: list[Comment] = []
         for comment in soup.select("div#comments div.comment-panel"):
             user_tag = comment.select_one("a[href^='/user/']")
             image_src = comment.find("img", class_="avatar")["src"]
             user = User(
                 username=user_tag["href"][6:],
                 profile_url=self.base_url + user_tag["href"],
-                photo_url=self.base_url + image_src if image_src.startswith("/") else image_src
+                photo_url=self.base_url + image_src if image_src.startswith("/") else image_src,
+                is_banned="BANNED" in user_tag["title"]
                 )
-            is_uploader = bool("(uploader)" in comment.select_one("div.col-md-2 p").text)
-            is_banned = bool("BANNED" in user_tag["title"])
             
             comments.append(
                 Comment(
                     id=int(comment["id"].split("-")[1]),
                     user=user,
-                    is_uploader=is_uploader,
-                    is_banned=is_banned,
+                    user_level=UserLevel.from_level_str(level_str=user_tag["title"].split()[0].lower()),
+                    is_uploader="(uploader)" in comment.select_one("div.col-md-2 p").text,
                     timestamp=datetime.utcfromtimestamp(int(comment.find("small", attrs={"data-timestamp": True})["data-timestamp"])),
                     text=comment.find("div", class_="comment-content").text
                     )
@@ -319,7 +316,7 @@ class NyaaClient:
             comments=comments
             )
     
-    def __extract_files_and_folders(self: "NyaaClient", tag: bs4.element.Tag) -> List[Union[File, Folder]]:
+    def __extract_files_and_folders(self: "NyaaClient", tag: bs4.element.Tag) -> list[File | Folder]:
         """
         Extract files and folders from a BeautifulSoup element tag containing <ul> tag.
         
@@ -327,9 +324,9 @@ class NyaaClient:
             tag (bs4.element.Tag): A BeautifulSoup element tag containing <ul> tag.
         
         Returns:
-            List[Union[File, Folder]]: A list File or Folder objects.
+            list[File | Folder]: A list File or Folder objects.
         """
-        files_and_folders: List[Union[File, Folder]] = []
+        files_and_folders: list[File | Folder] = []
         for li in tag.select("ul li"):
             if (folder_tag := li.find("a", class_="folder")):
                 files_and_folders.append(

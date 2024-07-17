@@ -1,9 +1,7 @@
-from typing import List, Optional, Union
-
 import httpx
 import feedparser
 
-from .enums import SITE, Filter, FunCategory, FapCategory, TorrentType
+from .enums import SITE, QualityFilter, FunCategory, FapCategory, TorrentType
 from .utils.categories import get_category_by_id
 
 from .models import NyaaRSSFeed, NyaaRSSTorrent
@@ -49,17 +47,19 @@ class NyaaRSSClient:
     
     async def get_feed(
         self: "NyaaRSSClient",
-        query: Optional[str] = None,
-        username: Optional[str] = None,
-        filter_: Optional[Filter] = Filter.NO_FILTER,
-        category: Optional[Union[FunCategory, FapCategory]] = None
+        term: str | None = None,
+        username: str | None = None,
+        quality_filter: QualityFilter | None = QualityFilter.NO_FILTER,
+        category: FunCategory | FapCategory | None = None,
+        use_magnet: bool | None = None
         ) -> NyaaRSSFeed:
         """
         Parameters:
-            query (Optional[str], optional): Search query. Defaults to None.
-            username (Optional[str], optional): Search torrents of a user. Defaults to None.
-            filter_ (Filter, optional): Search by filter. Defaults to Filter.NO_FILTER.
-            category (Union[FunCategory, FapCategory], optional): Search by category. Defaults to None. If None, it'll be assigned to (FanCategory/FapCategory).ALL_CATEGORIES depending on site.
+            term (str | None, optional): Search term. Defaults to None.
+            username (str | None, optional): Search torrents of a user. Defaults to None.
+            quality_filter (QualityFilter | None, optional): Filter torrents by quality. If not specified, defaults to QualityFilter.NO_FILTER.
+            category (FunCategory | FapCategory | None, optional): Filter torrents by category. If not specified, a default category is used. Defaults to None.
+            use_magnet (bool | None, optional): Whether to use magnet links. Defaults to None.
         
         Raises:
             httpx.HTTPError: If an HTTP-related error occurs during the request.
@@ -72,26 +72,28 @@ class NyaaRSSClient:
         
         params = {
             "page": "rss",
-            "q": query,
+            "q": term,
             "u": username,
-            "f": filter_.value,
-            "c": category.value
+            "f": quality_filter.value,
+            "c": category.value,
+            "magnets": use_magnet
         }
+        
         response: httpx.Response = await self._http_client.get(self.base_url, params=params)
         response.raise_for_status()
         
         parsed_feed = feedparser.parse(response.text)
         
-        torrents: List[NyaaRSSTorrent] = []
+        torrents: list[NyaaRSSTorrent] = []
         for entry in parsed_feed.entries:
             torrent_type = TorrentType.NORMAL
             if entry.nyaa_trusted.lower() == "yes":
                 torrent_type = TorrentType.TRUSTED
             elif entry.nyaa_remake.lower() == "yes":
-                torrent_type = TorrentType.REMAKES
+                torrent_type = TorrentType.REMAKE
             
             view_id = int(entry.guid.split("/view/")[-1])
-            category = get_category_by_id(site=self.site, id_=entry.nyaa_categoryid)
+            category = get_category_by_id(site=self.site, category_id=entry.nyaa_categoryid)
             
             torrents.append(
                 NyaaRSSTorrent(
@@ -102,7 +104,8 @@ class NyaaRSSClient:
                     size=entry.nyaa_size,
                     published=entry.published,
                     published_parsed=entry.published_parsed,
-                    torrent_url=entry.link,
+                    torrent_url=entry.link if not use_magnet else None,
+                    magnet_link=entry.link if use_magnet else None,
                     seeders=int(entry.nyaa_seeders),
                     leechers=int(entry.nyaa_leechers),
                     completed=int(entry.nyaa_downloads),

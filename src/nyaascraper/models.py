@@ -1,9 +1,9 @@
-from typing import List, Optional, Union
+from typing import Union
 from dataclasses import dataclass
 from datetime import datetime
 import time
 
-from .enums import FunCategory, FapCategory, TorrentType
+from .enums import FunCategory, FapCategory, TorrentType, UserLevel
 
 @dataclass
 class SearchResultTorrent:
@@ -13,7 +13,7 @@ class SearchResultTorrent:
     Attributes:
         torrent_type (TorrentType): The type of the torrent.
         view_id (int): The View-ID of the torrent.
-        category (Union[FunCategory, FapCategory]): The category of the torrent.
+        category (FunCategory | FapCategory): The category of the torrent.
         category_icon_url (str): The URL of the icon of category.
         torrent_url (str): The URL of the torrent file.
         magnet_link (str): The Magnet Link of the torrent.
@@ -27,7 +27,7 @@ class SearchResultTorrent:
     torrent_type: TorrentType
     view_id: int
     name: str
-    category: Union[FunCategory, FapCategory]
+    category: FunCategory | FapCategory
     category_icon_url: str
     torrent_url: str
     magnet_link: str
@@ -44,7 +44,7 @@ class SearchResult:
     Search result.
     
     Attributes:
-        torrents (List[SearchResultTorrent]): A list of SearchResultTorrent objects.
+        torrents (list[SearchResultTorrent]): A list of SearchResultTorrent objects.
         displaying_from (int): The number of results displaying from.
         displaying_to (int): The number of results displaying to.
         total_results (int): The number of total results.
@@ -53,14 +53,14 @@ class SearchResult:
         next_page (int, optional): The number of next result page. Defaults to None.
         available_pages (int, optional): The number of currently avaiable result pages. If exceeded, there might be more result pages. Defaults to None.
     """
-    torrents: List[SearchResultTorrent]
+    torrents: list[SearchResultTorrent]
     displaying_from: int
     displaying_to: int
     total_results: int
     current_page: int
-    previous_page: Optional[int] = None
-    next_page: Optional[int] = None
-    available_pages: Optional[int] = None
+    previous_page: int | None = None
+    next_page: int | None = None
+    available_pages: int | None = None
 
 @dataclass
 class User:
@@ -71,10 +71,14 @@ class User:
         username (str): The username of the user.
         profile_url (str): The URL of the user.
         photo_url (str, optional): The URL of the photo of the user. Defaults to None.
+        is_banned: (bool, optional): Indicates if the user is banned.
+        user_level: (UserLevel, optional): The level of the user.
     """
     username: str
     profile_url: str
-    photo_url: Optional[str] = None
+    photo_url: str | None = None
+    user_level: UserLevel | None = None
+    is_banned: bool | None = None
 
 @dataclass
 class File:
@@ -95,10 +99,10 @@ class Folder:
     
     Attributes:
         name (str): The name of the folder.
-        files (List[Union[File, "Folder"]]): A list of File or Folder objects.
+        files (list[File | Folder]): A list of File or Folder objects.
     """
     name: str
-    files: List[Union[File, "Folder"]]
+    files: list[Union[File, "Folder"]]
 
 @dataclass
 class Comment:
@@ -108,15 +112,13 @@ class Comment:
     Attributes:
         id (int): The ID of the comment.
         user (User): The user who commented.
-        is_uploader (int): Indicates if the user is uploader of the torrent.
-        is_banned (int): Indicates if the user is banned.
-        timestamp (int): The timestamp of when the comment was made.
+        is_uploader (bool): Indicates if the user is uploader of the torrent.
+        timestamp (datetime): The timestamp of when the comment was made.
         text (str): The text of the comment.
     """
     id: int
     user: User
     is_uploader: bool
-    is_banned: bool
     timestamp: datetime
     text: str
 
@@ -136,15 +138,15 @@ class TorrentInfo:
         leechers (str): The number of leechers of the torrent.
         completed (str): The number of times the torrent has been completed.
         info_hash (str): The info hash of the torrent.
-        submitter (Optional[User]): The user who uploaded this torrent. If anonymous, the value is None.
+        submitter (User | None): The user who uploaded this torrent. If anonymous, the value is None.
         information (str): The information of the torrent.
         description (str): The description of the torrent.
-        files (List[Union[File, Folder]]): A list of torrent files.
+        files (list[File | Folder]): A list of torrent files.
         total_comments (int): The number of total comments on the torrent.
-        comments (List[Comment]): A list of comments on the torrent.
+        comments (list[Comment]): A list of comments on the torrent.
     """
     name: str
-    category: Union[FunCategory, FapCategory]
+    category: FunCategory | FapCategory
     torrent_url: str
     magnet_link: str
     size: str
@@ -153,12 +155,12 @@ class TorrentInfo:
     leechers: int
     completed: int
     info_hash: str
-    submitter: Optional[User]
+    submitter: User | None
     information: str
     description: str
-    files: List[Union[File, Folder]]
+    files: list[File | Folder]
     total_comments: int
-    comments: List[Comment]
+    comments: list[Comment]
 
 @dataclass
 class NyaaRSSTorrent:
@@ -173,7 +175,8 @@ class NyaaRSSTorrent:
         size (str): The size of the torrent.
         published (str): The published date/time string.
         published_parsed (time.struct_time): The published date/time as a struct_time object.
-        torrent_url (str): The URL of the torrent file.
+        torrent_url (str | None): The URL of the torrent file.
+        magnet_link (str | None): The magnet link.
         seeders (int): The number of seeders of the torrent.
         leechers (int): The number of leechers of the torrent.
         completed (int): The number of times the torrent has been completed.
@@ -185,11 +188,12 @@ class NyaaRSSTorrent:
     torrent_type: TorrentType
     view_id: int
     name: str
-    category: Union[FunCategory, FapCategory]
+    category: FunCategory | FapCategory
     size: str
     published: str
     published_parsed: time.struct_time
-    torrent_url: str
+    torrent_url: str | None
+    magnet_link: str | None
     seeders: int
     leechers: int
     completed: int
@@ -205,8 +209,8 @@ class NyaaRSSFeed:
     Attributes:
         title (str): The title of the RSS feed.
         description (str): The description of the RSS feed.
-        torrents (List[NyaaRSSTorrent]): A list of torrents in the RSS feed.
+        torrents (list[NyaaRSSTorrent]): A list of torrents in the RSS feed.
     """
     title: str
     description: str
-    torrents: List[NyaaRSSTorrent]
+    torrents: list[NyaaRSSTorrent]
