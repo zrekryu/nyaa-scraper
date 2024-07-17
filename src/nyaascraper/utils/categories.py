@@ -1,9 +1,7 @@
-from typing import Dict, Union
-
 from ..enums.categories import FunCategory, FapCategory
 from ..enums.site import SITE
 
-fun_category_ids: Dict[str, FunCategory] = {
+fun_category_ids: dict[str, FunCategory] = {
     "0_0": FunCategory.ALL_CATEGORIES,
     
     "1_0": FunCategory.ANIME,
@@ -36,7 +34,7 @@ fun_category_ids: Dict[str, FunCategory] = {
     "6_2": FunCategory.SOFTWARE__GAMES
 }
 
-fap_category_ids: Dict[str, FapCategory] = {
+fap_category_ids: dict[str, FapCategory] = {
     "0_0": FapCategory.ALL_CATEGORIES,
     
     "1_0": FapCategory.ART,
@@ -51,7 +49,7 @@ fap_category_ids: Dict[str, FapCategory] = {
     "2_2": FapCategory.REAL_LIFE__VIDEOS
 }
 
-fun_category_titles: Dict[str, str] = {
+fun_category_titles: dict[str, str] = {
     "0_0": "All Categories",
     
     "1_0": "Anime",
@@ -84,7 +82,7 @@ fun_category_titles: Dict[str, str] = {
     "6_2": "Software - Games"
 }
 
-fap_category_titles: Dict[str, str] = {
+fap_category_titles: dict[str, str] = {
     "0_0": "All Categories",
     
     "1_0": "Art",
@@ -99,35 +97,35 @@ fap_category_titles: Dict[str, str] = {
     "2_2": "Real Life - Videos"
 }
 
-def get_category_by_id(site: SITE, id_: str) -> Union[FunCategory, FapCategory]:
+def get_category_by_id(site: SITE, category_id: str) -> FunCategory | FapCategory:
     """
-    Get the category enum member corresponding to the site and id.
+    Get the category enum member corresponding to the site and category id.
 
     Parameters:
         site (SITE): The site.
-        id_ (str): The id associated with the category.
+        category_id (str): The id associated with the category.
 
     Raises:
         ValueError: If the site is not recognized.
         KeyError: If the id is not found in the category.
 
     Returns:
-        Union[FunCategory, FapCategory]: The category enum member corresponding to the given site and id.
+        FunCategory | FapCategory: The category enum member corresponding to the given site and id.
     """
     if site == SITE.FUN:
-        return fun_category_ids[id_]
+        return fun_category_ids[category_id]
     elif site == SITE.FAP:
-        return fap_category_ids[id_]
+        return fap_category_ids[category_id]
     else:
         raise ValueError(f"Unknown site: {site}")
 
-def get_category_title_by_id(site: SITE, id_: str) -> str:
+def get_category_title_by_id(site: SITE, category_id: str) -> str:
     """
-    Get the category title corresponding to the site and id.
+    Get the category title corresponding to the site and category id.
 
     Parameters:
         site (SITE): The site.
-        id_ (str): The id associated with the category title.
+        category_id (str): The id associated with the category title.
 
     Raises:
         ValueError: If the site is not recognized.
@@ -137,8 +135,8 @@ def get_category_title_by_id(site: SITE, id_: str) -> str:
         str: The category title corresponding to the given site and id.
     """
     if site == SITE.FUN:
-        return fun_category_titles[id_]
+        return fun_category_titles[category_id]
     elif site == SITE.FAP:
-        return fap_category_titles[id_]
+        return fap_category_titles[category_id]
     else:
         raise ValueError(f"Unknown site: {site}")
