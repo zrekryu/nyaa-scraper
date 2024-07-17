@@ -3,10 +3,10 @@ from setuptools import setup, find_packages
 from nyaascraper import __version__
 
 with open("README.md", "r", encoding="utf-8") as file:
-    long_description = file.read()
+    long_description: str = file.read()
 
 with open("requirements.txt", "r", encoding="utf-8") as file:
-    requirements = [line.strip() for line in file.read()]
+    requirements: list[str] = [line.strip() for line in file.read()]
 
 setup(
     name="nyaasi-scraper",
