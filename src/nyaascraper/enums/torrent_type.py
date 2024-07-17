@@ -22,7 +22,7 @@ class TorrentType(Enum):
             color (str): The color of the torrent.
         
         Raises:
-            ValueError: If the color string is not known by the TorrentType enum.
+            ValueError: If the color is not known by the TorrentType enum.
         
         Returns:
             TorrentType: Enum member of the TorrentType corresponding to the color.
@@ -34,4 +34,4 @@ class TorrentType(Enum):
         elif color == "danger":
             return cls.REMAKE
         else:
-            raise ValueError(f"Unknown color: {color}")
+            raise ValueError(f"Unknown torrent color: {color}")
